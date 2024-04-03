@@ -2,6 +2,7 @@
 
 import {useRouter} from "vue-router";
 import store from "../store/index.js";
+import {ref} from "vue";
 
 
 const router = useRouter();
@@ -12,14 +13,21 @@ const user = {
   remember: false
 }
 
+const isLoading = ref(false)
+
 function login(e) {
   e.preventDefault();
+  isLoading.value = true;
   store.dispatch('login', user)
     .then(() => {
+      isLoading.value = false;
       router.push({
         name: 'Dashboard'
       });
-      console.log('redirect to dashboard');
+    })
+    .catch((error) => {
+      isLoading.value = false;
+      console.log(error);
     })
 }
 </script>
@@ -49,7 +57,13 @@ function login(e) {
       </div>
 
       <div>
-        <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+        <button
+          :disabled="isLoading"
+          type="submit"
+          class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Sign in
+        </button>
       </div>
     </form>
 

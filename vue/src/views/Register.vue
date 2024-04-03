@@ -1,8 +1,12 @@
 <script setup>
 import store from "../store/index.js";
 import {useRouter} from "vue-router";
+import {ref} from "vue";
 
- const router = useRouter()
+ const router = useRouter();
+
+ const isLoading = ref(false);
+
  const user = {
    name: '',
    email: '',
@@ -12,8 +16,10 @@ import {useRouter} from "vue-router";
 
  function register(e) {
    e.preventDefault();
+   isLoading.value = true;
    store.dispatch('register', user)
      .then(() => {
+       isLoading.value = false;
        router.push({ name: 'Dashboard'})
      })
  }
@@ -60,7 +66,13 @@ import {useRouter} from "vue-router";
       </div>
 
       <div>
-        <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Register now</button>
+        <button
+          :disabled="isLoading"
+          type="submit"
+          class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Register now
+        </button>
       </div>
     </form>
 
