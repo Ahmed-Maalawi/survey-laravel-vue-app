@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('slug', 1000);
             $table->tinyInteger('status');
             $table->text('description')->nullable();
+            $table->dateTime('expire_date')->nullable();
             $table->timestamps();
         });
     }

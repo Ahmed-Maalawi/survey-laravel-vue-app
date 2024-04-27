@@ -1,5 +1,6 @@
 import {createStore} from "vuex";
 import axiosClient from "../axios.js";
+import {resolveTransitionHooks} from "vue";
 
 const tempSurveys = [
   {
@@ -112,21 +113,41 @@ const store = createStore({
   state: {
 
     user: {
-      data: {
-        name: 'ahmed',
-        email: "ahmed@gmail.com",
-        imageUrl: 'https:images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixi'
-      },
+      data: {},
       token: sessionStorage.getItem('TOKEN'),
     },
 
     surveys: [...tempSurveys],
+    questionTypes: ["text", "select", "radio", "checkbox", "textarea"],
 
   },
   getters: {},
   actions: {
+    saveSurvey( { commit }, survey) {
+      let response;
+      if (survey.id) {
+        response = axiosClient
+          .put(`/survey/${survey.id}`, survey)
+          .then((res) => {
+            commit("updateSurvey", res.data);
+            return res;
+          });
+      } else {
+        response = axiosClient
+          .post(`/survey`, survey)
+          .then((res) => {
+            commit("updateSurvey", res.data);
+            return res;
+          });
+      }
+    },
     register({ commit }, user) {
       // return axiosClient.post('/register', user)
+      //   .then(({data}) => {
+      //     commit('setUser', data.user);
+      //     commit('setToken', data.token)
+      //     return data;
+      //   });
       return fetch('http://survey-app.test/api/register', {
         headers: {
           "Content-Type": "application/json",
@@ -145,6 +166,11 @@ const store = createStore({
     login({commit}, user) {
 
       // return axiosClient.post('/login', user)
+      //   .then(({data}) => {
+      //     commit('setUser', data.user);
+      //     commit('setToken', data.token)
+      //     return data;
+      //   })
       return fetch('http://survey-app.test/api/login', {
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +186,12 @@ const store = createStore({
         });
     },
 
-    logout({commit}) {
+    logout({commit}, user) {
+      // return axiosClient.post('/logout')
+      //   .then(response => {
+      //     commit('logout');
+      //     return response;
+      //   });
       return fetch('http://survey-app.test/api/login', {
         headers: {
           "Content-Type": "application/json",
@@ -173,9 +204,28 @@ const store = createStore({
           commit('logout');
           return res;
         });
+    },
+
+    getUser({commit}) {
+      return axiosClient.get('/user')
+        .then(res => {
+          console.log(res);
+          commit('setUser', res.data)
+        })
     }
   },
   mutations: {
+    saveSurvey: (state, survey) => {
+      state.surveys = [...state.surveys, survey.data]
+    },
+    updateSurvey: (state, survey) => {
+      state.surveys = state.surveys.map((s) => {
+        if (s.id == survey.data.id) {
+          return survey.data;
+        }
+        return s;
+      });
+    },
     logout: (state) => {
       state.user.token = null;
       state.user.data = [];

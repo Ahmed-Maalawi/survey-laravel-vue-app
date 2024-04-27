@@ -45,27 +45,19 @@
   </PageComponent>
 </template>
 
-<script>
+<script setup>
 import PageComponent from "../components/PageComponent.vue";
 import store from "../store/index.js";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {useRoute} from "vue-router";
 
-const route = useRoute();
+const surveys =  computed(() => store.state.surveys);
 
-export default {
-  name: 'Survey',
-  components: { PageComponent },
+function deleteSurvey(survey) {
+  if (confirm(`Are you sure you want to delete this survey? Operation can't be undone!!`)) {
 
-  mounted() {
-    this.surveys = store.state.surveys;
-  },
-  methods: {
-    deleteSurvey(survey) {
-      if (confirm(`Are you sure to you to delete this survey?`)) {
-        //
-      }
-    }
   }
 }
+
+
 </script>
